@@ -1,0 +1,1056 @@
+/* ---------- Основа ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--page);
+  scrollbar-color: var(--hairline-strong) transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font: 400 15px/22px var(--font-ui);
+  color: var(--text);
+  background: var(--page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Каркас ----------
+ *
+ * Телефон: одна колонка. Обёртки боковой панели и основной части «растворяются»
+ * (display: contents), и блоки выстраиваются в порядке чтения:
+ * марка → день и прогресс → фильтр → поле ввода → список.
+ *
+ * Широкий экран: слева панель с фильтром и клавишами, справа — день и список.
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  max-width: 712px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 16px 16px calc(96px + env(safe-area-inset-bottom));
+}
+
+.side,
+.main,
+.main__inner {
+  display: contents;
+}
+
+.side__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  order: 1;
+  height: 36px;
+  animation: rise 480ms var(--ease) backwards;
+}
+
+.dayhead {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  order: 2;
+  margin-top: 24px;
+  animation: rise 480ms var(--ease) 40ms backwards;
+}
+
+.filters {
+  order: 3;
+  margin-top: 24px;
+  animation: rise 480ms var(--ease) 80ms backwards;
+}
+
+.composer-wrap {
+  order: 4;
+  margin-top: 12px;
+  animation: rise 480ms var(--ease) 120ms backwards;
+}
+
+.notice {
+  order: 5;
+}
+
+.tasks {
+  order: 6;
+  animation: rise 480ms var(--ease) 160ms backwards;
+}
+
+.empty {
+  order: 7;
+}
+
+.list-foot {
+  order: 8;
+  animation: fade 480ms var(--ease) 220ms backwards;
+}
+
+.shortcuts {
+  order: 9;
+}
+
+@media (min-width: 900px) {
+  .app {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .side {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    height: 100dvh;
+    padding: 28px 24px;
+    overflow-y: auto;
+    background: var(--side);
+    border-right: 1px solid var(--hairline);
+  }
+
+  .main {
+    display: block;
+    padding: 64px 56px 128px;
+  }
+
+  .main__inner {
+    display: block;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .dayhead {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin: 0 0 40px;
+  }
+
+  .filters,
+  .composer-wrap {
+    margin-top: 0;
+  }
+}
+
+/* ---------- Марка ---------- */
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__mark rect {
+  fill: var(--text);
+}
+
+.brand__mark path {
+  fill: none;
+  stroke: var(--accent-on-ink);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand__name {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+/* ---------- День: главный заголовок экрана ---------- */
+
+.day {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 44px;
+  letter-spacing: -0.02em;
+}
+
+.day span {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .day {
+    font-size: 64px;
+    line-height: 64px;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* ---------- Прогресс ---------- */
+
+.progress {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.progress__figure {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 40px;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+
+.progress__of {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 24px;
+  color: var(--muted);
+}
+
+/* Когда выполнено всё, счёт обводится красным карандашом */
+.progress__circle {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: calc(100% + 28px);
+  height: calc(100% + 22px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* На широком экране счёт стоит у правого края колонки, и обводке есть куда выйти */
+@media (min-width: 900px) {
+  .progress__circle {
+    left: -18px;
+    width: calc(100% + 36px);
+  }
+}
+
+.progress__circle path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 240ms var(--ease),
+    opacity 240ms var(--ease);
+}
+
+.progress.is-complete .progress__circle path {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 720ms var(--ease) 240ms,
+    opacity 120ms var(--ease) 240ms;
+}
+
+/* Отметки: короткая серая — задача ждёт, высокая красная с наклоном — сделана */
+.tally {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 7px;
+  padding-bottom: 4px;
+}
+
+.tally__mark {
+  width: 5px;
+  height: 32px;
+  border-radius: 3px;
+  background: var(--hairline-strong);
+  transform: scaleY(0.45);
+  transform-origin: 50% 100%;
+  transition:
+    transform var(--slow) var(--ease),
+    background-color var(--slow) var(--ease);
+}
+
+.tally__mark.is-done {
+  background: var(--accent);
+  transform: scaleY(1) rotate(9deg);
+}
+
+.tally.is-dense {
+  gap: 4px 5px;
+}
+
+.tally.is-dense .tally__mark {
+  width: 3px;
+  height: 20px;
+}
+
+@media (min-width: 900px) {
+  .progress {
+    flex: none;
+    flex-direction: column;
+    max-width: 280px;
+    gap: 20px;
+  }
+
+  .progress__figure {
+    font-size: 56px;
+    line-height: 56px;
+  }
+
+  .tally__mark {
+    height: 40px;
+  }
+
+  .tally.is-dense .tally__mark {
+    height: 20px;
+  }
+}
+
+/* ---------- Число, которое перелистывается ---------- */
+
+.roll {
+  position: relative;
+  display: inline-block;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.roll__value {
+  display: inline-block;
+}
+
+/* ---------- Фильтр ---------- */
+
+.filters {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--raised);
+}
+
+.filter {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 8px;
+  color: var(--text-2);
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+  transition: color var(--fast) var(--ease);
+}
+
+.filter:hover,
+.filter[aria-pressed='true'] {
+  color: var(--text);
+}
+
+.filter__pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: var(--page);
+  box-shadow:
+    inset 0 0 0 1px var(--hairline),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.filter__label,
+.filter__count {
+  position: relative;
+}
+
+.filter__count {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* На самых узких экранах счётчики уступают место названиям */
+@media (max-width: 359px) {
+  .filter__count {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .filters {
+    flex-direction: column;
+    gap: 2px;
+    margin-right: -12px;
+    margin-left: -12px;
+    padding: 0;
+    background: none;
+  }
+
+  .filter {
+    flex: none;
+    justify-content: space-between;
+    padding: 0 12px;
+    font-size: 15px;
+  }
+
+  .filter__pill {
+    background: var(--raised-2);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+  }
+}
+
+/* ---------- Клавиши ---------- */
+
+.shortcuts {
+  display: none;
+}
+
+@media (min-width: 900px) and (hover: hover) {
+  .shortcuts {
+    display: block;
+    margin-top: auto;
+    font-size: 13px;
+    line-height: 20px;
+    color: var(--muted);
+    animation: fade 480ms var(--ease) 200ms backwards;
+  }
+}
+
+.shortcuts__list {
+  display: grid;
+  gap: 8px;
+}
+
+.shortcuts__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shortcuts__keys {
+  display: flex;
+  gap: 4px;
+}
+
+.shortcuts__note {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 4px;
+  background: var(--page);
+  font: 400 12px/16px var(--font-ui);
+  color: var(--text-2);
+}
+
+/* ---------- Кнопки ---------- */
+
+.button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 16px 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease),
+    box-shadow var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button--primary {
+  background: var(--text);
+  color: var(--page);
+}
+
+.button--primary:hover {
+  background: color-mix(in srgb, var(--text) 86%, var(--page));
+}
+
+/* Пока поле пустое, кнопка тихая; с первым символом становится главной на экране */
+.button--primary[aria-disabled='true'] {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--hairline-strong);
+  color: var(--muted);
+}
+
+.button--quiet {
+  height: 32px;
+  margin-right: -12px;
+  padding: 0 12px;
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.button--quiet:hover {
+  background: var(--raised-2);
+  color: var(--text);
+}
+
+.icon-button {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text-2);
+  transition:
+    background-color var(--fast) var(--ease),
+    color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.icon-button:hover {
+  background: var(--raised-2);
+  color: var(--text);
+}
+
+.icon-button:active {
+  transform: scale(0.96);
+}
+
+.icon-button__icon {
+  display: grid;
+}
+
+.icon-button--small {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.icon-button--danger:hover {
+  color: var(--danger);
+}
+
+/* ---------- Поле новой задачи ---------- */
+
+.composer-wrap {
+  position: relative;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 7px 7px 20px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 16px;
+  background: var(--side);
+  transition: border-color var(--fast) var(--ease);
+}
+
+.composer:focus-within {
+  border-color: var(--text-2);
+}
+
+.composer__input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 17px;
+  line-height: 24px;
+  caret-color: var(--accent);
+}
+
+.composer__input::placeholder {
+  color: var(--text-2);
+  opacity: 1;
+}
+
+.composer .button {
+  height: 40px;
+  border-radius: 9px;
+}
+
+/* На самых узких экранах от кнопки остаётся плюс; подпись по-прежнему читается экранной читалкой */
+@media (max-width: 359px) {
+  .composer .button {
+    gap: 0;
+    padding: 0 12px;
+  }
+
+  .composer .button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.composer__hint {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 20px;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--danger);
+  animation: fade 200ms var(--ease) backwards;
+}
+
+.notice {
+  margin-top: 28px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: var(--raised);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-2);
+}
+
+/* ---------- Список ---------- */
+
+.tasks {
+  position: relative;
+  margin: 28px -12px 0;
+}
+
+.task {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 24px minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: 8px;
+  padding: 14px 12px;
+  border-radius: 10px;
+  background: var(--page);
+}
+
+/* Линейка тетрадного листа под каждой строкой */
+.task::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: 0;
+  left: 12px;
+  height: 1px;
+  background: var(--hairline);
+  transition: opacity var(--fast) var(--ease);
+}
+
+.task.is-dragging {
+  z-index: 2;
+  box-shadow: var(--shadow-float);
+  cursor: grabbing;
+}
+
+.task.is-dragging::after {
+  opacity: 0;
+}
+
+.task__grip {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    opacity var(--fast) var(--ease),
+    color var(--fast) var(--ease);
+}
+
+.task__grip:hover {
+  color: var(--text);
+}
+
+.task__title {
+  min-width: 0;
+  font-size: 17px;
+  line-height: 24px;
+  overflow-wrap: anywhere;
+  cursor: text;
+  transition: color var(--slow) var(--ease);
+}
+
+/*
+ * Зачёркивание — линия акцентного цвета, которая прорисовывается слева направо.
+ * Фон у строчного элемента продолжается с одной строки текста на другую,
+ * поэтому длинная задача зачёркивается строка за строкой, как рукой.
+ */
+.task__title > span {
+  background: linear-gradient(var(--accent), var(--accent)) no-repeat 0 56% / 0% 2px;
+  transition: background-size var(--slow) var(--ease);
+}
+
+.task.is-done .task__title {
+  color: var(--muted);
+}
+
+.task.is-done .task__title > span {
+  background-size: 100% 2px;
+}
+
+.task__editor {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: 0 1px 0 var(--accent);
+  font-size: 17px;
+  line-height: 24px;
+  resize: none;
+  overflow: hidden;
+  caret-color: var(--accent);
+}
+
+.task__actions {
+  display: flex;
+  gap: 2px;
+  margin: -2px -4px -2px 0;
+  transition: opacity var(--fast) var(--ease);
+}
+
+/* Во время правки кнопки строки не нужны: сохранение — Enter, отмена — Esc */
+.task.is-editing .task__actions {
+  visibility: hidden;
+}
+
+/* Мышь: кнопки строки появляются при наведении и при переходе с клавиатуры */
+@media (hover: hover) {
+  .task__actions {
+    opacity: 0;
+  }
+
+  .task:hover .task__actions,
+  .task:focus-within .task__actions {
+    opacity: 1;
+  }
+}
+
+/* На широком экране ручка перетаскивания живёт на полях, слева от строки */
+@media (min-width: 900px) {
+  .task {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    column-gap: 12px;
+  }
+
+  .task__grip {
+    position: absolute;
+    top: 14px;
+    left: -20px;
+    width: 24px;
+  }
+}
+
+@media (min-width: 900px) and (hover: hover) {
+  .task__grip {
+    opacity: 0;
+  }
+
+  .task:hover .task__grip,
+  .task:focus-within .task__grip,
+  .task.is-dragging .task__grip {
+    opacity: 1;
+  }
+}
+
+/* ---------- Флажок ---------- */
+
+.check {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+
+.check input {
+  position: absolute;
+  inset: -8px;
+  z-index: 1;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.check__box {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--muted);
+  border-radius: 7px;
+  transition:
+    background-color var(--fast) var(--ease),
+    border-color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.check__box svg {
+  display: block;
+  margin: -1.5px;
+}
+
+.check__box path {
+  fill: none;
+  stroke: var(--page);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  transition: stroke-dashoffset 260ms var(--ease);
+}
+
+.check:hover .check__box {
+  border-color: var(--text-2);
+}
+
+.check input:active + .check__box {
+  transform: scale(0.9);
+}
+
+.check input:checked + .check__box {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.check input:checked + .check__box path {
+  stroke-dashoffset: 0;
+  transition-delay: 60ms;
+}
+
+.check input:focus-visible + .check__box {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Подвал списка ---------- */
+
+.list-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  min-height: 32px;
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-2);
+}
+
+/* ---------- Пустой список ---------- */
+
+.empty {
+  animation: fade 320ms var(--ease) backwards;
+}
+
+.empty__lines span {
+  display: block;
+  height: 52px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.empty__title {
+  margin-top: 24px;
+  font-size: 17px;
+  line-height: 24px;
+}
+
+.empty__text {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-2);
+}
+
+/* ---------- Всплывающая строка «Вернуть» ---------- */
+
+.toast-layer {
+  position: fixed;
+  right: 0;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  left: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .toast-layer {
+    left: 280px;
+  }
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 16px;
+  border-radius: 12px;
+  background: var(--text);
+  box-shadow: var(--shadow-float);
+  color: var(--page);
+  font-size: 14px;
+  line-height: 20px;
+  pointer-events: auto;
+}
+
+.toast__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  border-radius: 6px;
+  color: var(--accent-on-ink);
+  font-weight: 500;
+  transition: background-color var(--fast) var(--ease);
+}
+
+.toast__action:hover {
+  background: color-mix(in srgb, var(--page) 12%, transparent);
+}
+
+.toast__action:focus-visible {
+  outline-color: var(--accent-on-ink);
+}
+
+/* ---------- Движение ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Смена темы: новая тема раскрывается кругом из кнопки-переключателя */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-reveal 560ms var(--ease);
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--reveal-x, 50%) var(--reveal-y, 50%));
+  }
+
+  to {
+    clip-path: circle(var(--reveal-r, 150vmax) at var(--reveal-x, 50%) var(--reveal-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
